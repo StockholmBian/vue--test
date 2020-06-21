@@ -43,15 +43,14 @@
     </div>
 </template>
 <script>
-import {reactive, ref, onMounted} from '@vue/composition-api'
 import { stripscript, validateEmail, validatePass, validateCodeword } from '@/utils/validate.js';
 export default {
     //当前的名称
     name: 'login',
-    //setup(props, context) {
-    setup(props, {refs}) {
+    //数据，v-model绑定数据使用
+    data() {
         //验证用户名为邮箱
-        let validateUsername = (rule, value, callback) => {
+        var validateUsername = (rule, value, callback) => {
             if (value === '') {
                 callback(new Error('请输入用户名'));
             } else if (validateEmail(value)) {
@@ -61,7 +60,7 @@ export default {
             }
         };
         //验证密码
-        let validatePassword = (rule, value, callback) => {
+        var validatePassword = (rule, value, callback) => {
             if (value === '') {
                 callback(new Error('请输入密码'));
             } else if (validatePass(value)) {
@@ -71,18 +70,18 @@ export default {
             }
         };
         //验证重复密码
-        let validatePasswords = (rule, value, callback) => {
-            if (model == 'login') {callback()}
+        var validatePasswords = (rule, value, callback) => {
+            if (this.model == 'login') {callback()}
             if (value === '') {
                 callback(new Error('请再次输入密码'));
-            } else if (value != ruleForm.password) {
+            } else if (value != this.ruleForm.password) {
                 callback(new Error('两次密码不一致'));
             } else {
                 callback();
             }
         };
         //验证验证码
-        let validateCode = (rule, value, callback) => {
+        var validateCode = (rule, value, callback) => {
             //过滤特殊字符
             // this.ruleForm.code = stripscript(value);
             // value = this.ruleForm.code;
@@ -94,54 +93,58 @@ export default {
                 callback();
             }
         };
-        /**
-         * 声明数据
-         */
-        //这里面放置data数据、生命周期、自定义的函数
-        const menuTab = reactive ([
-            {txt: '登陆', current:true, type: 'login'},
-            {txt: '注册', current:false, type: 'register'}
-        ])
-        //模块值
-        const model  = ref('login')
-        //表单绑定数据
-        const ruleForm = reactive ({
-            username: '',
-            password: '',
-            passwords: '',
-            code: ''
-        })
-        //表单的验证
-        const rules = reactive ({
-            username: [
-                { validator: validateUsername, trigger: 'blur' }
+        return {
+            menuTab: [
+                {txt: '登陆', current:true, type: 'login'},
+                {txt: '注册', current:false, type: 'register'}
             ],
-            password: [
-                { validator: validatePassword, trigger: 'blur' }
-            ],
-            passwords: [
-                { validator: validatePasswords, trigger: 'blur' }
-            ],
-            code: [
-                { validator: validateCode, trigger: 'blur' }
-            ]
-        })
-        /**
-         * 声明函数
-         */
+            //模块值
+            model: 'login',
+            //表单的数据
+            ruleForm: {
+                username: '',
+                password: '',
+                passwords: '',
+                code: ''
+            },
+            rules: {
+                username: [
+                    { validator: validateUsername, trigger: 'blur' }
+                ],
+                password: [
+                    { validator: validatePassword, trigger: 'blur' }
+                ],
+                passwords: [
+                    { validator: validatePasswords, trigger: 'blur' }
+                ],
+                code: [
+                    { validator: validateCode, trigger: 'blur' }
+                ]
+            }
+        }
+    },
+    //创建完成后自动执行（生命周期其中一个）
+    created(){},
+    //挂载完成后自动执行（生命周其其中一个）
+    mounted(){
+    },
+    //定义函数
+    methods: {
+        //vue数据驱动系统渲染
+        //传统js操作DOM元素
         //切换登陆和注册
-        const toggleMneu = (data => {
-            menuTab.forEach(element => {
+        toggleMneu(data){
+            this.menuTab.forEach(element => {
                 element.current=false
             });
             //高亮
             data.current=true;
             //修改模块值
-            model.value = data.type
-        })
+            this.model=data.type
+        },
         //提交
-        const submitForm = (formName => {
-            refs[formName].validate((valid) => {
+        submitForm(formName) {
+            this.$refs[formName].validate((valid) => {
             if (valid) {
                 alert('submit!');
             } else {
@@ -149,22 +152,8 @@ export default {
                 return false;
             }
             });
-        })
-        /**
-         * 生命周期
-         */
-        //挂载完成后
-        onMounted(() => {})
-
-        return {
-            menuTab,
-            model,
-            ruleForm,
-            rules,
-            toggleMneu,
-            submitForm
-        }
-    },
+        },
+    }
 }
 </script>>
 </script>>
